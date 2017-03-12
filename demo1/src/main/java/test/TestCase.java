@@ -19,6 +19,7 @@ public class TestCase {
         UserService us = (UserService) ac.getBean("userService");
 
         us.save();
+        us.update();
 
     }
 }
