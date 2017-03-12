@@ -9,9 +9,8 @@ import javax.annotation.Resource;
  * Created by Administrator on 2017/3/11.
  * zhaoyuwy@163.com
  */
-public abstract  class BaseServiceImpl<T> implements BaseService<T> {
+public abstract class BaseServiceImpl<T> implements BaseService<T> {
     private BaseDao<T> baseDao;
-
 
 
     @Resource
@@ -23,9 +22,7 @@ public abstract  class BaseServiceImpl<T> implements BaseService<T> {
     }
 
 
-
     @Override
-
     public void save() {
 
         // TODO Auto-generated method stub
@@ -33,7 +30,6 @@ public abstract  class BaseServiceImpl<T> implements BaseService<T> {
         baseDao.save();
 
     }
-
 
 
     @Override
