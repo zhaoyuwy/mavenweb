@@ -12,11 +12,11 @@
 
 
 
-    <context:component-scan base-package="dao,service"></context:component-scan>
+    <context:component-scan base-package="com.ceshi.dao,com.ceshi.service"></context:component-scan>
 
 
 
-    <bean class="session.Session"></bean>
+    <bean class="com.ceshi.session.Session"></bean>
 
 
 

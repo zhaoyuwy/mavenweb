@@ -3,7 +3,7 @@ package test;
 import org.junit.Test;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-import service.impl.UserService;
+import com.ceshi.service.impl.UserService;
 
 /**
  * Created by Administrator on 2017/3/11.

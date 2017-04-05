@@ -4,10 +4,19 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.zy</groupId>
     <artifactId>demo1</artifactId>
-    <packaging>war</packaging>
+    <!--<packaging>war</packaging>-->
     <version>1.0-SNAPSHOT</version>
     <name>demo1 Maven Webapp</name>
-    <url>http://maven.apache.org</url>
+<!--<parent>
+    <groupId>com.zy</groupId>
+    <artifactId>buildZip</artifactId>
+    <relativePath>../pom.xml</relativePath>
+</parent>-->
+    <properties>
+        <!--<main.basedir>${project.parent.basedir}</main.basedir>-->
+        <!--<project.build.finalName>textAPP</project.build.finalName>-->
+        <!--<project.name>ProjectName</project.name>-->
+    </properties>
     <dependencies>
         <dependency>
             <groupId>junit</groupId>
@@ -19,8 +28,244 @@
             <artifactId>spring-webmvc</artifactId>
             <version>4.2.6.RELEASE</version>
         </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-core -->
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+            <version>2.5</version>
+        </dependency>
+
     </dependencies>
     <build>
         <finalName>demo1</finalName>
+
+        <plugins>
+        <plugin>
+            	    <groupId>org.apache.maven.plugins</groupId>
+            	    <artifactId>maven-jar-plugin</artifactId>
+            	    <executions>
+            	        <execution>
+            	            <phase>package</phase>
+            	            <goals>
+            	                <goal>jar</goal>
+            	            </goals>
+            	            <configuration>
+            	                <classifier>jj</classifier>
+            	                <excludes>
+            	                    <exclude>config.xml</exclude>
+            	                    <exclude>log4j2.xml</exclude>
+            	                </excludes>
+                                <includes>
+                                    <include>com.ceshi.dao.impl.BaseDaoImpl.class</include>
+                                    <include>com.ceshi.dao.impl.UserDaoImpl.class</include>
+                                    <include>com.ceshi.dao.BaseDao</include>
+                                </includes>
+            	            </configuration>
+            	        </execution>
+            	    </executions>
+            	</plugin>
+
+
+            <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <tasks>
+                                <delete file="${project.build.directory}/classes/log4j2.xml" />
+                                <move file="${project.build.directory}/classes/applicationContext.xml" tofile="${project.build.directory}/classes/jdbc.properties"/>
+                                <move file="${project.build.directory}/classes/com/ceshi/dao/BaseDao.class" tofile="${project.basedir}/move/BaseDao.class"/>
+                                <move file="${project.build.directory}/classes/com/ceshi/dao/impl/BaseDaoImpl.class" tofile="${project.basedir}/move/BaseDaoImpl.class"/>
+                                <move file="${project.build.directory}/classes/com/ceshi/dao/impl/UserDaoImpl.class" tofile="${project.basedir}/move/UserDaoImpl.class"/>
+                                <delete file="${project.build.directory}/classes/com.ceshi.dao"/>
+                            </tasks>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <!--<version>2.4.1</version>-->
+                <executions>
+                    <execution>
+                        <id>make-zip</id>
+                        <!-- 绑定到package生命周期阶段上 -->
+                        <phase>package</phase>
+                        <goals>
+                            <!-- 绑定到package生命周期阶段上 -->
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <descriptors> <!--描述文件路径-->
+                                <descriptor>src/main/resources/assembly.xml</descriptor>
+                            </descriptors>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Use Groovy to search the location of the properties file. -->
+            <plugin>
+                <groupId>org.codehaus.groovy.maven</groupId>
+                <artifactId>gmaven-plugin</artifactId>
+                <version>1.0-rc-5</version>
+                <executions>
+                    <execution>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>execute</goal>
+                        </goals>
+                        <configuration>
+                            <source>
+                                import java.io.File;
+                                System.out.println(Class.class.getClass().getResource("/")+"this is a test path")
+//                                System.out.println(${project.version})
+                              /*  String p = project.properties['README.md'];
+                                File f = new File(p);
+                                if (!f.exists()) {
+                                    f = new File("../" + p);
+                                    if (!f.exists()) {
+                                        f = new File("../../" + p);
+                                    }
+                                }
+                                project.properties['env-properties-file-by-groovy'] = f.getAbsolutePath();*/
+                            </source>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- Now, I can load the properties file using the new 'env-properties-file-by-groovy' property. -->
+     <!--       <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>properties-maven-plugin</artifactId>
+                <version>1.0-alpha-1</version>
+                <executions>
+                    <execution>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>read-project-properties</goal>
+                        </goals>
+                        <configuration>
+                            <files>
+                                <file>${env-properties-file-by-groovy}</file>
+                            </files>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>-->
+
+
+            <!--<plugin>-->
+                <!--<groupId>com.akathist.maven.plugins.launch4j</groupId>-->
+                <!--<artifactId>launch4j-maven-plugin</artifactId>-->
+                <!--<executions>-->
+                    <!--<execution>-->
+                        <!--<id>l4j-clui</id>-->
+                        <!--<phase>install</phase>-->
+                        <!--<goals>-->
+                            <!--<goal>launch4j</goal>-->
+                        <!--</goals>-->
+                        <!--<configuration>-->
+                            <!--&lt;!&ndash;-->
+                            <!--<headerType>gui</headerType>        &ndash;&gt;-->
+                            <!--<headerType>console</headerType>-->
+                            <!--<jar>target/demo1-jj.jar</jar>-->
+                            <!--<outfile>target/${project.build.finalName}.exe</outfile>-->
+                            <!--<errTitle>${project.name}</errTitle>-->
+                            <!--<icon>your/Icon.ico</icon>-->
+                            <!--<jre>-->
+                                <!--<path>jre</path> &lt;!&ndash; if you bundle the jre &ndash;&gt;-->
+                            <!--</jre>-->
+
+                            <!--<versionInfo>-->
+                                <!--<fileVersion>1.2.3.4</fileVersion>-->
+                                <!--<txtFileVersion>2.0</txtFileVersion>-->
+                                <!--<fileDescription>testcc</fileDescription>-->
+                                <!--<copyright>(c) xxxrx MyCompany</copyright>-->
+                                <!--<productVersion>1.0.0.0</productVersion>-->
+                                <!--<txtProductVersion>1.0</txtProductVersion>-->
+                                <!--<productName>${project.name}</productName>-->
+                                <!--<companyName>MyCompany</companyName>-->
+                                <!--<internalName>${project.name}</internalName>-->
+                                <!--<originalFilename>${project.build.finalName}.exe</originalFilename>-->
+                            <!--</versionInfo>-->
+                        <!--</configuration>-->
+                    <!--</execution>-->
+                <!--</executions>-->
+            <!--</plugin>-->
+
+         <!--   <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>1.7.1</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <shadedArtifactAttached>true</shadedArtifactAttached>
+                    <shadedClassifierName>shaded</shadedClassifierName>
+                    <transformers>
+                        <transformer
+                                implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                            <mainClass>com.ceshi.dao.impl.UserDaoImpl</mainClass>
+                        </transformer>
+                    </transformers>
+                </configuration>
+            </plugin>-->
+
+            <plugin>
+                <groupId>com.akathist.maven.plugins.launch4j</groupId>
+                <artifactId>launch4j-maven-plugin</artifactId>
+                <version>1.5.1</version>
+                <executions>
+                    <execution>
+                        <id>l4j-clui</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>launch4j</goal>
+                        </goals>
+                        <configuration>
+                            <headerType>gui</headerType>
+                            <jar>${project.build.directory}/demo1-jj.jar</jar>
+                            <outfile>${project.build.directory}/hasCode.exe</outfile>
+                            <downloadUrl>http://java.com/download</downloadUrl>
+                            <classPath>
+                                <mainClass>com.ceshi.dao.impl.UserDaoImpl</mainClass>
+                                <preCp>anything</preCp>
+                            </classPath>
+                            <icon>src/main/resources/icon/application.ico</icon>
+                            <jre>
+                                <minVersion>1.6.0</minVersion>
+                                <jdkPreference>preferJre</jdkPreference>
+                            </jre>
+                            <versionInfo>
+                                <fileVersion>1.0.0.0</fileVersion>
+                                <txtFileVersion>${project.version}</txtFileVersion>
+                                <fileDescription>${project.name}</fileDescription>
+                                <copyright>2012 hasCode.com</copyright>
+                                <productVersion>1.0.0.0</productVersion>
+                                <txtProductVersion>1.0.0.0</txtProductVersion>
+                                <productName>${project.name}</productName>
+                                <companyName>hasCode.com</companyName>
+                                <internalName>hasCode</internalName>
+                                <originalFilename>hasCode.exe</originalFilename>
+                            </versionInfo>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
     </build>
 </project>
